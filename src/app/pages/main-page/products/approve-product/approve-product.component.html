@@ -1,0 +1,68 @@
+<mat-dialog-content>
+  
+  <div class="card card-warning">
+    
+    <div class="card-header">
+    	
+    	<h2 class="card-title mb-0">Approve Product</h2>
+        <button type="button" class="close" mat-dialog-close >&times;</button>
+
+    </div>
+
+    <form
+    	autocomplete="off"
+      	[formGroup]="f"
+      	(ngSubmit)="approveProduct()">
+
+	    <div class="card-body">
+
+            <ng-container *ngIf="!loadData">
+
+                <div class="form-group text-center">
+                
+                    <mat-slide-toggle color="primary" [checked]="visible" (change)="approve($event, data.id)"></mat-slide-toggle>  
+
+                </div>
+
+			 	<!-- Comment -->
+                <div class="form-group">
+                 	
+                	<label for="InputAbout">Comment</label>
+
+                	<textarea 
+                	id="InputComment" 
+                	class="form-control" 
+                	placeholder="Comment"
+                	formControlName="comment"
+                	[ngClass]="{'is-invalid': invalidField('comment') || comment.invalid && comment.errors?.pattern }"></textarea>
+
+                	<span class="invalid-feedback" *ngIf="comment.invalid && comment.errors?.required">Please provide a comment</span>
+                    <span class="invalid-feedback" *ngIf="comment.invalid && comment.errors?.pattern">Please write the comment correctly</span>
+
+                </div>	                     
+
+            </ng-container>
+
+            <div *ngIf="loadData" class="overlay">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+            </div>
+
+        </div>
+
+	    <div class="card-footer">
+	    	
+	    	
+	    	<button mat-dialog-close class="btn btn-secondary">Close</button>
+	    	<button  type="submit" class="btn btn-warning  float-right">Save</button>
+
+	    </div>
+
+    </form>
+
+
+  </div> 
+
+</mat-dialog-content>
+
+
+

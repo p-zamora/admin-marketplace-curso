@@ -1,0 +1,117 @@
+<mat-dialog-content>
+	
+	<div class="card card-warning">
+
+		<div class="card-header">
+    	
+	    	<h2 class="card-title mb-0">New SubCategory</h2>
+	        <button type="button" class="close" mat-dialog-close >&times;</button>
+
+	    </div>
+
+ 	 	<form
+    	autocomplete="off"
+      	[formGroup]="f"
+      	(ngSubmit)="saveSubCategory()">
+
+      		<div class="card-body">
+      			
+      			<ng-container *ngIf="!loadData">
+      				
+      				<!-- Category -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputCategory">Category</label>
+
+	                	<select
+	                	class="form-control"
+	                	formControlName="category"
+	                	[ngClass]="{'is-invalid': invalidField('category')}"
+	                	(change)="selectCategory($event)"
+	                	>
+	                		
+	                		<option value="">Select Category</option>
+
+	                		<option *ngFor="let category of categories" value="{{category.name}}">{{category.name}}</option>
+
+	                	</select>
+
+	                	<span class="invalid-feedback" *ngIf="category.invalid && category.errors?.required">Please provide a category</span>      
+
+	                </div>
+
+	                <!-- Title List -->
+	                <div *ngIf="!category.invalid" class="form-group">
+	                 	
+	                	<label for="InputTitleList">Title List</label>
+
+	                	<select
+	                	class="form-control"
+	                	formControlName="titleList"
+	                	[ngClass]="{'is-invalid': invalidField('titleList')}"
+	                	>
+	                		
+	                		<option value="">Select Title List</option>
+
+	                		<option *ngFor="let tl of titleListArray" value="{{tl}}">{{tl}}</option>
+
+	                	</select>
+
+	                	<span class="invalid-feedback" *ngIf="titleList.invalid && titleList.errors?.required">Please provide a titleList</span>
+
+	                </div>
+
+	                <!-- Name -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputName">Name</label>
+
+	                	<input 
+	                	type="text" 
+	                	id="InputName" 
+	                	class="form-control" 
+	                	placeholder="Name"
+	                	formControlName="name"
+	                	[ngClass]="{'is-invalid': invalidField('name') || name.invalid && name.errors?.pattern || name.invalid && name.errors?.subcategory }">
+
+	                	<span class="invalid-feedback" *ngIf="name.invalid && name.errors?.required">Please provide a name</span>
+	                    <span class="invalid-feedback" *ngIf="name.invalid && name.errors?.pattern">Please write the name correctly</span>
+	                     <span class="invalid-feedback" *ngIf="name.invalid && name.errors?.subcategory">The category already exists</span>
+
+	                </div>
+
+	                 <!-- Url -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputUrl">Url</label>
+
+	                	<input 
+	                	type="text" 
+	                	id="InputUrl" 
+	                	class="form-control" 
+	                	placeholder="Url"
+	                    value="{{urlInput}}"
+	                    readonly>
+
+	                </div>
+
+      			</ng-container>
+
+      			<div *ngIf="loadData" class="overlay">
+	                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+	            </div>
+
+      		</div>
+
+      		<div class="card-footer">   	
+	    	
+		    	<button mat-dialog-close class="btn btn-secondary">Close</button>
+		    	<button  type="submit" class="btn btn-warning  float-right">Save</button>
+
+		    </div>
+
+      	</form>
+
+    </div>
+
+</mat-dialog-content>

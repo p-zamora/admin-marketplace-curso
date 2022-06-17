@@ -1,0 +1,497 @@
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Products</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+              <li class="breadcrumb-item active">Products</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- Default box -->
+      <div class="card">
+        <div class="card-header">
+
+          <div [hidden]="loadData" class="row">
+
+            <div class="col-12 col-sm-6 col-xl-3 mr-auto">
+            
+              <a
+              *ngIf="products.length > 0"
+               class="btn btn-block bg-gradient-warning" [routerLink]="['new-product/',products[0].store]">New Product</a> 
+
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3 ml-auto">
+            
+              <input class="form-control" placeholder="Search" (keyup)="applyFilter($event)">   
+
+            </div>
+
+          </div>
+        
+        </div>
+
+        <div class="card-body">
+
+          <div class="mat-table-container">
+
+            <table [hidden]="loadData" mat-table [dataSource]="dataSource" multiTemplateDataRows matSort matSortActive="position" matSortDirection="asc" class="mat-elevation-z8 matTable-table">
+
+               <!-- Position Column -->
+              <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> No. </th>
+                <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+              </ng-container>
+
+               <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+              </ng-container>
+
+              <!-- Image Column -->
+              <ng-container *ngIf="!screenSizeSM" matColumnDef="image">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Image </th>
+                <td mat-cell *matCellDef="let element">
+
+                  <img src="{{path}}products/{{element.category}}/{{element.image}}" width="100" class="img-fluid p-3">
+
+                </td>
+              </ng-container>
+
+              <!-- Url Name Column -->
+              <ng-container *ngIf="!screenSizeSM" matColumnDef="store">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Store </th>
+                <td mat-cell *matCellDef="let element"> {{element.store}} </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let element">
+
+                  <button 
+                    class="btn btn-sm btn-warning mr-1"
+                    (click)="expandedElement = expandedElement === element ? null : element">
+                    <i class="fas fa-eye"></i>
+                  </button>
+
+                  <button *ngIf="element.store != nameStore && element.feedback.type != 'approved'"
+                  class="btn btn-sm btn-secondary mr-1"
+                  (click)="approveProduct(element.id)"
+                  >
+                    <i class="far fa-clock"></i>
+                  </button>
+
+                   <button *ngIf="element.store != nameStore && element.feedback.type == 'approved'"
+                  class="btn btn-sm btn-success mr-1"
+                  (click)="approveProduct(element.id)"
+                  >
+                    <i class="fas fa-check"></i>
+                  </button>
+
+                  <button *ngIf="element.store == nameStore"
+                  class="btn btn-sm btn-dark mr-1"
+                  [routerLink]="['edit-product/',element.id]"
+                  >
+                    <i class="fas fa-pencil-alt"></i>             
+                  </button>
+
+                  <button *ngIf="element.store == nameStore"
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteProduct(element.id, element.category, element.image, element.gallery, element.default_banner, element.top_banner['IMG tag'], element.horizontal_slider['IMG tag'], element.vertical_slider)"
+
+                  >
+                    <i class="fas fa-trash"></i>             
+                  </button>
+
+                 </td>
+              </ng-container> 
+              
+              <ng-container matColumnDef="expandedDetail"> 
+
+                <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                
+                  <div class="example-element-detail" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+                  
+                    <ul class="container pl-0">
+
+                      <!-- Image Row -->
+                      <li class="py-2" *ngIf="screenSizeSM">
+                        <img src="{{path}}products/{{element.category}}/{{element.image}}" width="100">
+                      </li>  
+
+                      <!-- Store Row -->
+                      <li class="py-2" *ngIf="screenSizeSM">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Store:</strong> 
+                        {{element.store}}
+                      </li>
+
+                      <!-- Category Row -->
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Category:</strong> 
+                        {{element.category}}
+                      </li>
+
+                       <!-- SubCategory Row -->
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Subcategory:</strong> 
+                        {{element.sub_category}}
+                      </li>
+
+                      <!-- Title List Row -->
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Title List:</strong> 
+                        {{element.title_list}}
+                      </li>
+
+                      <!-- Tags Row -->
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Tags:</strong> 
+                        {{element.tags |  jsonToString}}
+                      </li>
+
+                      <!-- Price Row -->
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Price:</strong> 
+                        {{element.price | currency}}
+                      </li>
+
+                      <!-- Shipping Row -->
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Shipping:</strong> 
+                        {{element.shipping | currency}}
+                      </li>
+
+                      <!-- Stock Row -->
+                      <li class="py-0">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Stock: </strong> 
+                          <h5 *ngIf="element.stock > 50" class="badge badge-success px-2">{{element.stock}}</h5>
+                          <h5 *ngIf="element.stock <= 50 && element.stock > 21" class="badge badge-warning px-2">{{element.stock}}</h5>
+                          <h5 *ngIf="element.stock < 20" class="badge badge-danger px-2">{{element.stock}}</h5>
+                      </li>
+
+                      <!-- Delivery Time Row -->
+                      <li class="py-1">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Delivery time:</strong> 
+                        {{element.delivery_time }} days
+                      </li>
+
+                       <!-- Offer Row -->
+                      <li class="py-1">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Offer:</strong> 
+                        {{element.offer  |  jsonToString}}
+                      </li>
+
+                       <!-- Summary Row -->
+                      <li class="py-1">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Summary:</strong> 
+                          <ul>
+                            <li *ngFor="let sum of element.summary">{{sum}}</li>
+                          </ul>
+                      </li>
+
+                       <!-- Specifications Row -->
+                      <li class="py-1">
+                        <span class="mx-2 text-muted">·</span>
+                        
+                        <strong class="mat-header-cell">Specification:</strong>
+
+                        <div 
+                        *ngIf="element.specification.length > 0"
+                        class="my-3">
+
+                          <div  *ngFor="let spec of element.specification" >
+
+                            <figure class="my-3">
+                              
+                              <figcaption>{{ spec | separateObjects }} <strong>Choose an option</strong></figcaption>
+
+                                <div 
+                                    *ngIf="(spec | separateObjects) == 'Color'"
+                                    class="d-flex">
+
+                                  <div
+                                   *ngFor="let value of spec[spec | separateObjects]"
+                                    class="rounded-circle mr-3 "
+                                    style="background-color:{{value}}; 
+                                         width:30px; 
+                                         height:30px; 
+                                         cursor:pointer;
+                                         border:1px solid #bbb"></div>
+
+                                </div>
+
+                                <div 
+                                    *ngIf="(spec | separateObjects) != 'Color'"
+                                    class="d-flex">
+
+                                  <div
+                                   *ngFor="let value of spec[spec | separateObjects]"
+                                    class="py-2 px-3 mr-3"
+                                    style="cursor:pointer;
+                                           border:1px solid #bbb">
+                                             
+                                           {{value}}
+
+                                  </div>
+
+
+                                </div>
+
+                              
+                            </figure>
+                            
+                            
+
+                          </div>
+                            
+
+                        </div>
+
+
+
+                      </li>
+
+                      <!-- Details Row -->
+                      <li class="py-1">
+                        <span class="mx-2 text-muted">·</span>
+                        
+                        <strong class="mat-header-cell">Details:</strong> 
+
+                          <table class="table table-bordered">
+
+                            <tbody>
+
+                                <tr *ngFor="let detail of element.details">
+                                  <td class="bg-light">{{detail.title}}</td>
+                                  <td>{{detail.value}}</td>
+                                </tr> 
+
+                            </tbody>
+
+                        </table>
+
+                      </li>
+
+                      <!-- Description Row -->
+                      <li class="py-1">
+                        
+                        <span class="mx-2 text-muted">·</span>
+                        
+                        <strong class="mat-header-cell">Description:</strong> 
+
+                        <div class="row">
+
+                          <div style="overflow-x:scroll" class="p-3" [innerHTML]="element.description"></div>
+
+                        </div>
+
+                      </li>
+
+                      <!-- Gallery Row -->
+                      <li class="py-1">
+                        <span class="mx-2 text-muted">·</span>
+                      
+                        <strong class="mat-header-cell">Gallery:</strong> 
+                        
+                        <div class="row">
+                          <figure 
+                          *ngFor="let pic of element.gallery"
+                          class="col-12 col-lg-3">
+                              <img src="{{path}}products/{{element.category}}/gallery/{{pic}}" class="img-thumbnail">
+                          </figure>
+                        </div>
+                              
+                      </li>
+
+                      <!-- Top Banner Row -->
+                      <li class="py-1">
+                        <span class="mx-2 text-muted">·</span>
+                      
+                        <strong class="mat-header-cell">Top Banner:</strong> 
+
+                          <div class="py-3">
+                              <p><strong>H3 tag:</strong> {{element.top_banner["H3 tag"]}}</p>
+                              <p><strong>P1 tag:</strong> {{element.top_banner["P1 tag"]}}</p>
+                              <p><strong>H4 tag:</strong> {{element.top_banner["H4 tag"]}}</p>
+                              <p><strong>P2 tag:</strong> {{element.top_banner["P2 tag"]}}</p>
+                              <p><strong>Span tag:</strong> {{element.top_banner["Span tag"]}}</p>
+                              <p><strong>Button tag:</strong> {{element.top_banner["Button tag"]}}</p>
+                              <p><strong>IMG tag:</strong></p>
+                              <img src="{{path}}products/{{element.category}}/top/{{element.top_banner['IMG tag']}}"  class="img-fluid">
+
+                          </div>
+
+                      </li>
+
+                       <!-- Default Banner Row -->
+                      <li class="py-1">
+                        <span class="mx-2 text-muted">·</span>
+                    
+                        <strong class="mat-header-cell">Default Banner:</strong> <br>
+                        <img src="{{path}}products/{{element.category}}/default/{{element.default_banner}}" alt="" class="img-fluid py-3">
+                      </li>
+
+                      <!-- Horizontal Slider Row -->
+                      <li class="py-1">
+                        
+                        <span class="mx-2 text-muted">·</span>
+                    
+                        <strong class="mat-header-cell">Horizontal Slider:</strong> 
+                        
+                        <div class="py-3">
+
+                            <p><strong>H4 tag:</strong> {{element.horizontal_slider["H4 tag"]}}</p>
+                            <p><strong>H3-1 tag:</strong> {{element.horizontal_slider["H3-1 tag"]}}</p>
+                            <p><strong>H3-2 tag:</strong> {{element.horizontal_slider["H3-2 tag"]}}</p>
+                            <p><strong>H3-3 tag:</strong> {{element.horizontal_slider["H3-3 tag"]}}</p>
+                            <p><strong>H3-4s tag:</strong> {{element.horizontal_slider["H3-4s tag"]}}</p>
+                           
+                            <p><strong>Button tag:</strong> {{element.horizontal_slider["Button tag"]}}</p>
+                            <p><strong>IMG tag:</strong></p>
+
+                            <img src="{{path}}products/{{element.category}}/horizontal/{{element.horizontal_slider['IMG tag']}}"  class="img-fluid">
+
+                        </div>
+                      </li>
+
+                      <!-- Vertical Slider Row -->
+                      <li class="py-1">
+                        
+                        <span class="mx-2 text-muted">·</span>
+                    
+                        <strong class="mat-header-cell">Vertical Slider:</strong> <br>
+                        <img src="{{path}}products/{{element.category}}/vertical/{{element.vertical_slider}}" alt="" class="img-fluid py-3">
+                      
+                      </li>
+
+                       <!-- Video Row -->
+                      <li class="py-1">
+
+                        <span class="mx-2 text-muted">·</span>
+                    
+                        <strong class="mat-header-cell">Video:</strong> <br>
+
+                           <iframe *ngIf="element.video[0] === 'youtube'"
+                            class="mb-3"
+                            [src]="'https://www.youtube.com/embed/' + element.video[1] | urlSecure"
+                            width="100%"
+                            height="360"
+                            frameborder="0" 
+                            allowfullscreen></iframe> 
+
+                            <iframe *ngIf="element.video[0] === 'vimeo'"
+                            class="mb-3"
+                            [src]="'https://player.vimeo.com/video/' + element.video[1] | urlSecure"
+                            width="100%"
+                            height="360"
+                            frameborder="0" 
+                            allowfullscreen></iframe> 
+
+                      </li>
+
+                      <!-- Views Row -->
+                      <li class="py-1">
+
+                        <span class="mx-2 text-muted">·</span>
+                    
+                        <strong class="mat-header-cell">Views:</strong>
+                          {{element.views}}
+
+                      </li>
+
+                      <!-- Sales Row -->
+                      <li class="py-1">
+
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Sales:</strong>
+                        {{element.sales}}
+                        
+                      </li>
+
+                      <!-- Reviews Row -->
+                      <li>  
+
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Reviews:</strong>
+
+                        <span *ngFor="let rev of element.reviews">
+                          
+                          <i *ngIf="rev == 1" class="fas fa-star text-warning"></i>
+                          <i *ngIf="rev == 2" class="far fa-star text-warning"></i>
+
+                        </span>
+
+                      </li>
+
+                    </ul>
+
+                  </div>
+
+                </td>
+
+              </ng-container>
+          
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+                  class="example-element-row"
+                  [class.example-expanded-row]="expandedElement === element">
+              </tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+
+              <!-- Row shown when there is no matching data. -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell text-center" [attr.colspan]="displayedColumns.length">No data matching the filter</td>
+              </tr>
+
+            </table>
+
+            <div *ngIf="loadData" class="text-center m-5">
+              
+              <div class="spinner-border"></div>
+
+            </div>
+            
+          </div>  
+
+        </div>
+
+        <!-- /.card-footer -->
+        <div class="card-footer">
+          <mat-paginator [hidden]="loadData" [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+        <!-- /.card-footer-->
+      </div>
+      <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+

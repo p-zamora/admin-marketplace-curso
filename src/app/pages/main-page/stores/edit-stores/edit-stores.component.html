@@ -1,0 +1,339 @@
+<mat-dialog-content>
+  
+	<div class="card card-warning">
+
+		<div class="card-header">
+
+			<h2 class="card-title mb-0">Edit Store</h2>
+			<button type="button" class="close" mat-dialog-close >&times;</button>
+
+		</div>
+
+		<form
+		autocomplete="off"
+		[formGroup]="f"
+		(ngSubmit)="editStore()">
+
+			<div class="card-body">
+				
+				<ng-container *ngIf="!loadData">
+					
+					<!-- Store -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputStore">Store</label>
+
+	                	<input 
+	                	type="text" 
+	                	class="form-control" 
+	                	value="{{storeView}}"
+	                	readonly>
+
+	                </div>
+
+	                 <!-- Url -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputUrl">Url</label>
+
+	                	<input 
+	                	type="text" 
+	                	class="form-control" 
+	                    value="{{urlView}}"
+	                    readonly>
+
+	                </div>  
+
+	                <!-- About -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputAbout">About</label>
+
+	                	<textarea 
+	                	id="InputAbout" 
+	                	rows="5"
+	                	class="form-control" 
+	                	placeholder="About"
+	                	formControlName="about"
+	                	[ngClass]="{'is-invalid': invalidField('about') || about.invalid && about.errors?.pattern }"></textarea>
+
+	                	<span class="invalid-feedback" *ngIf="about.invalid && about.errors?.required">Please provide a about</span>
+	                    <span class="invalid-feedback" *ngIf="about.invalid && about.errors?.pattern">Please write the about correctly</span>
+
+	                </div>	
+
+	                 <!-- email -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputEmail">Email</label>
+
+	                	<input 
+	                	type="email" 
+	                	id="InputEmail" 
+	                	class="form-control" 
+	                	placeholder="email"
+	                	formControlName="email"
+	                	[ngClass]="{'is-invalid': invalidField('email') || email.invalid && email.errors?.pattern }">
+
+	                	<span class="invalid-feedback" *ngIf="email.invalid && email.errors?.required">Please provide a email</span>
+	                    <span class="invalid-feedback" *ngIf="email.invalid && email.errors?.pattern">Please write the email correctly</span>
+
+	                </div>
+
+                  <!-- Country -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputCountry">Country</label>
+
+	                	<select
+	                	class="form-control" 
+	                	formControlName="country"
+	                	[ngClass]="{'is-invalid': invalidField('country') || country.invalid && country.errors?.pattern }"
+	                    (change)="changeCountry($event)"
+	                	>	
+
+	                		<option value="{{country.value}}">{{country.value.split("_")[0]}}</option>
+	                		<option *ngFor="let country of countries" value="{{country.name}}_{{country.dial_code}}">{{country.name}}</option>	
+
+	                	</select>
+
+	                	<span class="invalid-feedback" *ngIf="country.invalid && country.errors?.required">Please provide a country</span>
+	                    <span class="invalid-feedback" *ngIf="country.invalid && country.errors?.pattern">Please write the country correctly</span>
+
+	                </div>
+
+	                <!-- city -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputCity">city</label>
+
+	                	<input 
+	                	type="text" 
+	                	id="InputCity" 
+	                	class="form-control" 
+	                	placeholder="city"
+	                	formControlName="city"
+	                	[ngClass]="{'is-invalid': invalidField('city') || city.invalid && city.errors?.pattern }">
+
+	                	<span class="invalid-feedback" *ngIf="city.invalid && city.errors?.required">Please provide a city</span>
+	                    <span class="invalid-feedback" *ngIf="city.invalid && city.errors?.pattern">Please write the city correctly</span>
+
+	                </div>	
+
+	                 <!-- phone -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputPhone">phone</label>
+
+	                    <div class="input-group">
+
+	                        <div class="input-group-append">
+	                            <span class="input-group-text">{{dialCode}}</span>
+	                        </div>
+
+	                    	<input 
+	                    	type="text" 
+	                    	id="InputPhone" 
+	                    	class="form-control" 
+	                    	placeholder="phone"
+	                    	formControlName="phone"
+	                    	[ngClass]="{'is-invalid': invalidField('phone') || phone.invalid && phone.errors?.pattern }">
+
+	                    </div>
+
+	                	<span class="invalid-feedback" *ngIf="phone.invalid && phone.errors?.required">Please provide a phone</span>
+	                    <span class="invalid-feedback" *ngIf="phone.invalid && phone.errors?.pattern">Please write the phone correctly</span>
+
+	                </div>	 
+
+	                 <!-- address -->
+	                <div class="form-group">
+	                 	
+	                	<label for="InputAddress">address</label>
+
+	                	<input 
+	                	type="text" 
+	                	id="InputAddress" 
+	                	class="form-control" 
+	                	placeholder="address"
+	                	formControlName="address"
+	                	[ngClass]="{'is-invalid': invalidField('address') || address.invalid && address.errors?.pattern }">
+
+	                	<span class="invalid-feedback" *ngIf="address.invalid && address.errors?.required">Please provide a address</span>
+	                    <span class="invalid-feedback" *ngIf="address.invalid && address.errors?.pattern">Please write the address correctly</span>
+
+	                </div>	  
+
+	                <!-- Logo -->
+	                <div class="form-group">
+	                	
+	                	<label for="customLogo">
+	          
+	                        <img [src]="logoTemp" class="img-fluid">
+	                	
+	                	</label>
+
+	                	<div class="custom-file">
+
+	                		<input 
+	                        type="file" 
+	                        class="custom-file-input" 
+	                        id="customLogo" 
+	                        formControlName="logo"
+	                        [ngClass]="{'is-invalid': invalidField('logo')}"
+	                        (change)="validateLogo($event)">
+
+
+	                        <span class="invalid-feedback"> Please provide a logo</span>
+
+	                		<label class="custom-file-label" for="customLogo" *ngIf="!logo.value">Choose logo</label>
+	                        <label class="custom-file-label" for="customLogo" *ngIf="logo.value">{{logo.value}}</label>
+
+	                        <small class="mt-2">300px * 300px size | jpg or png format</small>
+
+	                	</div>
+	    	
+	                </div>	 
+
+	                <!-- Cover -->
+	                <div class="form-group">
+	                	
+	                	<label for="customCover">
+	          
+	                        <img [src]="coverTemp" class="img-fluid">
+	                	</label>
+
+	                	<div class="custom-file">
+
+	                		<input 
+	                        type="file" 
+	                        class="custom-file-input" 
+	                        id="customCover" 
+	                        formControlName="cover"
+	                        [ngClass]="{'is-invalid': invalidField('cover')}"
+	                        (change)="validateCover($event)">
+
+
+	                        <span class="invalid-feedback"> Please provide a cover</span>
+
+	                		<label class="custom-file-label" for="customCover" *ngIf="!cover.value">Choose cover</label>
+	                        <label class="custom-file-label" for="customCover" *ngIf="cover.value">{{cover.value}}</label>
+
+	                        <small class="mt-2">1500px * 800px size | jpg or png format</small>
+
+	                	</div>
+	    	
+	                </div>
+
+                  	<!--=====================================
+	                Redes sociales de la tienda
+	                ======================================-->
+
+	                <div class="form-group">
+
+	                	<label>Social Networks</label>
+
+	                	<!--=====================================
+	                    Facebook
+	                    ======================================-->
+
+	                    <div class="input-group mb-3">
+	                        
+	                        <div class="input-group-append">
+	                            <span class="input-group-text">https://facebook.com</span>
+	                        </div>
+
+	                        <input type="text"
+	                        class="form-control"
+	                        formControlName="facebook"> 
+
+	                    </div>
+
+                    	<!--=====================================
+	                    instagram
+	                    ======================================-->
+
+	                    <div class="input-group mb-3">
+	                        
+	                        <div class="input-group-append">
+	                            <span class="input-group-text">https://instagram.com</span>
+	                        </div>
+
+	                        <input type="text"
+	                        class="form-control"
+	                        formControlName="instagram"> 
+
+	                    </div>
+
+	                    <!--=====================================
+	                    twitter
+	                    ======================================-->
+
+	                    <div class="input-group mb-3">
+	                        
+	                        <div class="input-group-append">
+	                            <span class="input-group-text">https://twitter.com</span>
+	                        </div>
+
+	                        <input type="text"
+	                        class="form-control"
+	                        formControlName="twitter"> 
+
+	                    </div>
+
+	                    <!--=====================================
+	                    linkedin
+	                    ======================================-->
+
+	                    <div class="input-group mb-3">
+	                        
+	                        <div class="input-group-append">
+	                            <span class="input-group-text">https://linkedin.com</span>
+	                        </div>
+
+	                        <input type="text"
+	                        class="form-control"
+	                        formControlName="linkedin"> 
+
+	                    </div>
+
+	                    <!--=====================================
+	                    youtube
+	                    ======================================-->
+
+	                    <div class="input-group mb-3">
+	                        
+	                        <div class="input-group-append">
+	                            <span class="input-group-text">https://youtube.com</span>
+	                        </div>
+
+	                        <input type="text"
+	                        class="form-control"
+	                        formControlName="youtube"> 
+
+	                    </div>
+                    
+                    </div>
+
+				</ng-container>
+
+			 	<div *ngIf="loadData" class="overlay">
+                	<i class="fas fa-2x fa-sync-alt fa-spin"></i>
+            	</div>
+
+			</div>
+
+			<div class="card-footer">
+	    		
+		    	<button mat-dialog-close class="btn btn-secondary">Close</button>
+		    	<button  type="submit" class="btn btn-warning  float-right">Save</button>
+
+		    </div>
+
+		</form>
+
+	</div> 
+
+</mat-dialog-content>
+
+

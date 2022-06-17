@@ -1,0 +1,261 @@
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+
+    <div class="container-fluid">
+
+      <!-- ---------------------------------------
+      INVENTARIOS
+      ------------------------------------------->
+
+      <div class="row">
+        <div class="col-12 col-sm-6 col-md-3">
+          <div class="info-box">
+            <span class="info-box-icon bg-info elevation-1"><i class="fas fa-shopping-cart"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Products</span>
+              <span *ngIf="loadProducts" class="info-box-number"><i class="fas fa-2x fa-sync-alt fa-spin"></i></span>
+              <span *ngIf="!loadProducts" class="info-box-number">{{products}}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-12 col-sm-6 col-md-3">
+          <div class="info-box mb-3">
+            <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-store"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Stores</span>
+              <span *ngIf="loadStores" class="info-box-number"><i class="fas fa-2x fa-sync-alt fa-spin"></i></span>
+              <span *ngIf="!loadStores" class="info-box-number">{{stores}}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+
+        <!-- fix for small devices only -->
+        <div class="clearfix hidden-md-up"></div>
+
+        <div class="col-12 col-sm-6 col-md-3">
+          <div class="info-box mb-3">
+            <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shipping-fast"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Sales</span>
+              <span *ngIf="loadSales" class="info-box-number"><i class="fas fa-2x fa-sync-alt fa-spin"></i></span>
+              <span *ngIf="!loadSales" class="info-box-number">{{sales}}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-12 col-sm-6 col-md-3">
+          <div class="info-box mb-3">
+            <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
+
+            <div class="info-box-content">
+              <span class="info-box-text">Members</span>
+              <span *ngIf="loadUsers" class="info-box-number"><i class="fas fa-2x fa-sync-alt fa-spin"></i></span>
+              <span *ngIf="!loadUsers" class="info-box-number">{{users}}</span>
+            </div>
+            <!-- /.info-box-content -->
+          </div>
+          <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+      </div>
+
+       <!-- ---------------------------------------
+      GRÁFICOS
+      ------------------------------------------->
+
+      <div class="row">
+
+        <div class="col-12">
+
+          <div class="card">
+
+            <div class="card-header">
+              <h5 class="card-title">Monthly Sales Report</h5>
+
+              <div class="card-tools">
+                
+                <mat-form-field appearance="fill">
+                  <mat-label>Enter a date range</mat-label>
+                  <mat-date-range-input [rangePicker]="picker">
+                    <input (dateChange)="getSales()" matStartDate placeholder="Start date" [(ngModel)]="startDate">
+                    <input (dateChange)="getSales()" matEndDate placeholder="End date" [(ngModel)]="endDate">
+                  </mat-date-range-input>
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-date-range-picker #picker></mat-date-range-picker>
+                </mat-form-field>
+
+              </div>
+
+            </div>
+
+            <div class="card-body text-center">
+
+              <p><strong>Sales:  -  {{startDate | date:'fullDate'}} - {{endDate | date:'fullDate'}} | Total: {{totalSales | currency }}</strong></p>
+
+              <google-chart *ngIf="!loadSales && chart.data.length > 0"  style="width: 100%;"
+                  [type]="chart.type"
+                  [data]="chart.data"
+                  [columns]="chart.columnNames"
+                  [options]="chart.options"
+                >
+              </google-chart>
+              <i *ngIf="loadSales"  class="fas fa-2x fa-sync-alt fa-spin my-5"></i>
+              <p  *ngIf="chart.data.length == 0">No Data</p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ---------------------------------------
+      REPORTES
+      ------------------------------------------->
+
+      <!-- Main row -->
+      <div class="row">
+        <!-- Left col -->
+        <div class="col-md-8">
+
+          <div class="card">
+            
+            <div class="card-header border-transparent">
+              <h3 class="card-title">Latest Orders</h3>
+            </div>
+
+            <div class="card-body">
+               
+              <div class="table-responsive">
+                
+                <table class="table m-0">
+                  
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Item</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+
+                  <tbody *ngIf="loadOrders">
+                    <tr>
+                      <td class="text-center py-5" colspan="4">
+                        <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                      </td>
+                    </tr>
+                  </tbody>
+
+                  <tbody *ngIf="!loadOrders">
+                  
+                    <tr *ngFor="let order of latestOrders.reverse()">
+                      
+                      <td>{{order.id}}</td>
+                      <td>{{order.product}}</td>
+                      
+                      <td>
+                        <span [ngClass]="{'badge-success':order.status === 'delivered','badge-warning':order.status === 'pending'}" class="badge">
+                      
+                          {{order.status}}
+
+                        </span>
+                      </td>
+
+                      <td>
+                        <div class="sparkbar">{{order.date | date}}</div>
+                      </td>
+
+                    </tr>
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+            </div>
+
+            <div class="card-footer clearfix">
+              <a [routerLink]="['/orders']"  class="btn btn-sm btn-secondary float-right">View All Orders</a>
+            </div>
+
+
+          </div> 
+        
+        </div>
+
+        <div class="col-md-4">
+          
+          <!-- PRODUCT LIST -->
+          <div class="card">
+            
+            <div class="card-header">
+              <h3 class="card-title">Recently Added Products</h3>
+            </div>
+
+            <div class="card-body p-0">
+              
+              <ul *ngIf="loadProducts" class="products-list product-list-in-card pl-2 pr-2">
+                <li class="item">
+                  <div class="text-center py-5">
+                    <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                  </div>
+                </li>
+              </ul>
+
+              <ul *ngIf="!loadProducts" class="products-list product-list-in-card pl-2 pr-2">
+                
+                <li class="item" *ngFor="let product of latestProducts.reverse()">
+
+                  <div class="product-img">
+                    <img src="{{path}}products/{{product.category}}/{{product.image}}" width="100" class="img-size-50">
+                  </div>
+
+                  <div class="product-info">
+                    
+                    <a href="{{domainMP}}product/{{product.url}}" target="_blank"> {{product.name}}</a>
+
+                    <span class="float-right pr-2">{{product.price | currency}}</span>
+
+                    <span class="product-description">{{product.store}}</span>
+
+                  </div>
+                  
+                </li>
+
+              </ul>
+
+
+
+            </div>
+
+            <div class="card-footer clearfix">
+              <a [routerLink]="['products']"  class="btn btn-sm btn-secondary float-right">View All products</a>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+      
+    </div><!-- /.container-fluid -->
+
+  </section>
+
+</div>

@@ -1,0 +1,190 @@
+<mat-dialog-content>
+  
+	<div class="card card-warning">
+
+		<div class="card-header">
+
+			<h2 class="card-title mb-0">Edit Store</h2>
+			<button type="button" class="close" mat-dialog-close >&times;</button>
+
+		</div>
+
+		<form
+		autocomplete="off"
+		[formGroup]="f"
+		(ngSubmit)="editOrder()">
+
+			<div class="card-body">
+				
+				<ng-container *ngIf="!loadData">
+
+					<div
+					*ngFor="let nextProcess of processOrder; let i = index"
+					class="card my-3">
+						
+						<div class="card-header text-uppercase">{{i+1}}. {{nextProcess.stage}}</div>
+
+						<div class="card-body">
+							
+							<!--=====================================
+							Bloque Fecha
+							======================================-->
+
+							<div class="form-row">
+								
+								<div class="col-2 text-right">
+					  				<label class="p-3 lead  small">Date:</label>
+					  			</div>
+
+					  			<div class="col-10">
+					  				
+					  				<input *ngIf="nextProcess.status == 'ok'" type="date" class="form-control" [value]="nextProcess.date | date:'yyyy-MM-dd'" readonly>
+
+					  				<input *ngIf="nextProcess.status == 'pending'" type="date" class="form-control" [value]="nextProcess.date | date:'yyyy-MM-dd'" #date (change)="changeProcess('date', date, i)">
+
+					  			</div>
+
+							</div>
+
+							<!--=====================================
+							Bloque Status
+							======================================-->
+
+							<div class="form-row">
+								
+								<div class="col-2 text-right">
+					  				<label class="p-3 lead small">Status:</label>
+					  			</div>
+
+					  			<div
+			  					*ngIf="nextProcess.status == 'pending'"
+			  					class="col-10 mt-3">
+
+						  			<div class="custom-control custom-radio custom-control-inline">
+						  				
+						  				<input
+						  				*ngIf="nextProcess.status == 'pending'"
+						  				id="status-pending{{i}}"
+						  				type="radio"
+						  				class="custom-control-input" 
+						  				value="pending"
+						  				name="status{{i}}"
+						  				#status
+						  				(change)="changeProcess('status', status, i)" 
+						  				checked>
+
+						  				<input
+						  				*ngIf="nextProcess.status == 'ok'"
+						  				id="status-pending{{i}}"
+						  				type="radio"
+						  				class="custom-control-input" 
+						  				value="pending"
+						  				name="status{{i}}" 
+						  				#status
+						  				(change)="changeProcess('status', status, i)" 
+						  				>
+
+						  				<label class="custom-control-label" for="status-pending{{i}}">Pending</label>
+
+						  			</div>
+
+						  			<div class="custom-control custom-radio custom-control-inline">
+						  				
+						  				<input
+						  				*ngIf="nextProcess.status == 'pending'"
+						  				id="status-ok{{i}}"
+						  				type="radio"
+						  				class="custom-control-input" 
+						  				value="ok"
+						  				name="status{{i}}"
+						  				#status
+						  				(change)="changeProcess('status', status, i)"  
+						  				>
+
+						  				<input
+						  				*ngIf="nextProcess.status == 'ok'"
+						  				id="status-ok{{i}}"
+						  				type="radio"
+						  				class="custom-control-input" 
+						  				value="ok"
+						  				name="status{{i}}" 
+						  				#status
+						  				(change)="changeProcess('status', status, i)" 
+						  				checked>
+
+						  				<label class="custom-control-label" for="status-ok{{i}}">Ok</label>
+
+						  			</div>
+						  				
+					  			</div>
+
+					  			<div
+			  					*ngIf="nextProcess.status == 'ok'"
+			  					class="col-10 mt-3">
+
+			  						<div class="text-uppercase">{{nextProcess.status}}</div>
+
+			  					</div>
+
+							</div>
+
+							<!--=====================================
+							Bloque Comentarios
+							======================================-->
+
+							<div class="form-row">
+								
+								<div class="col-2 text-right">
+									<label class="p-3 lead small">Comment:</label>
+								</div>
+
+								<div class="col-10"
+								*ngIf="nextProcess.status == 'ok'"
+								>	
+									<textarea class="form-control" [value]="nextProcess.comment" readonly></textarea>
+								</div>
+
+								<div class="col-10"
+								*ngIf="nextProcess.status == 'pending'"
+								>	
+									<textarea 
+									class="form-control"
+									#comment
+					  				(change)="changeProcess('comment', comment, i)"  
+									[value]="nextProcess.comment"></textarea>
+								</div>
+
+
+							</div>
+
+
+						</div>
+
+
+					</div>
+					
+
+
+
+				</ng-container>
+
+				<div *ngIf="loadData" class="overlay">
+                	<i class="fas fa-2x fa-sync-alt fa-spin"></i>
+            	</div>
+			
+			</div>
+
+			<div class="card-footer">
+				
+				<button mat-dialog-close class="btn btn-secondary">Close</button>
+		    	<button  type="submit" class="btn btn-warning  float-right">Save</button>
+
+			</div>
+
+
+		</form>
+
+	</div>
+
+</mat-dialog-content>
+

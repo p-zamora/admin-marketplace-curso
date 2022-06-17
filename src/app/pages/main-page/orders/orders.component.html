@@ -1,0 +1,320 @@
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Orders</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+              <li class="breadcrumb-item active">Orders</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <!-- Default box -->
+      <div class="card">
+        <div class="card-header">
+
+           <div [hidden]="loadData" class="row mb-2">
+            
+            <div class="col-12 col-sm-6 col-xl-3 ml-auto">
+              
+              <input class="form-control" placeholder="Search" (keyup)="applyFilter($event)">   
+
+            </div>
+
+          </div>
+          
+        </div>
+
+        <div class="card-body">
+
+           <div class="mat-table-container">
+
+             <table [hidden]="loadData" mat-table [dataSource]="dataSource" multiTemplateDataRows matSort matSortActive="position" matSortDirection="asc" class="mat-elevation-z8 matTable-table">
+
+              <!-- Position Column -->
+              <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> No. </th>
+                <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+              </ng-container>
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                <td mat-cell *matCellDef="let element">
+                  
+                  <span 
+                  *ngIf="element.status == 'pending'"
+                  class="badge badge-danger p-3">
+                    {{element.status}}
+                  </span>
+
+                  <span 
+                  *ngIf="element.status == 'delivered'"
+                  class="badge badge-success p-3">
+                    {{element.status}}
+                  </span>
+
+                </td>
+              </ng-container>
+
+               <!-- Name Column -->
+              <ng-container *ngIf="!screenSizeSM" matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
+                <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+              </ng-container>
+
+               <!-- Name Column -->
+              <ng-container *ngIf="!screenSizeSM" matColumnDef="product">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Product </th>
+                <td mat-cell *matCellDef="let element"><a href="{{domainMP}}product/{{element.url}}" target="_blank"> {{element.product}}</a> </td>
+              </ng-container>
+
+               <!-- Name Column -->
+              <ng-container *ngIf="!screenSizeSM" matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Quantity </th>
+                <td mat-cell *matCellDef="let element"> {{element.quantity}} </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let element">
+                  
+                  <button 
+                    class="btn btn-sm btn-warning mr-1"
+                    (click)="expandedElement = expandedElement === element ? null : element">
+                    <i class="fas fa-eye"></i>
+                  </button>
+
+                  <button *ngIf="element.store == nameStore"
+                  class="btn btn-sm btn-dark mr-1"
+                   (click)="editOrder(element.id)"
+                  >
+                    <i class="fas fa-pencil-alt"></i>             
+                  </button>
+
+                </td>
+              </ng-container>
+
+               <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+              <ng-container matColumnDef="expandedDetail">
+
+                <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+                  
+                  <div class="example-element-detail"
+                       [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+                    
+                    <ul class="pl-0">
+                      
+                      <li class="py-2" *ngIf="screenSizeSM">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Id:</strong> 
+                        {{element.id}}
+                      </li>
+
+                       <li class="py-2" *ngIf="screenSizeSM">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Product:</strong> 
+                        <a href="{{domainMP}}product/{{element.url}}" target="_blank">{{element.product}}</a>
+                      </li>
+
+                       <li class="py-2" *ngIf="screenSizeSM">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Quantity:</strong> 
+                        {{element.quantity}}
+                      </li>
+
+                       <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Store:</strong> 
+                        {{element.store}}
+                      </li>
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Price:</strong> 
+                        {{element.price  | currency}}
+                      </li>
+
+                      <li class="py-2">
+                         <img src="{{path}}products/{{element.category}}/{{element.image}}" width="100">
+                      </li> 
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Details:</strong> 
+                        <div class="ml-4" [innerHTML]="element.details"></div> 
+                      </li>
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">User:</strong> 
+                        {{element.user}}
+                      </li>
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Email:</strong> 
+                        {{element.email}}
+                      </li>
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Phone:</strong> 
+                        {{element.phone}}
+                      </li>
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Address:</strong> 
+                        {{element.address}}
+                      </li>
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">City:</strong> 
+                        {{element.city}}
+                      </li>
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Country:</strong> 
+                        {{element.country}}
+                      </li>
+
+                      <li class="py-2">
+                        <span class="mx-2 text-muted">·</span>
+                        <strong class="mat-header-cell">Process:</strong> 
+
+                        <ul class="timeline pl-2">
+
+                          <!--=====================================
+                          1 Momento: Órden de entrega recibida
+                          ======================================-->
+        
+                          <li *ngIf="element.process[0].stage == 'reviewed' && element.process[0].status== 'ok'"
+                          class="success ml-5"> 
+
+                              <h5>{{element.process[0].date | date}}</h5>
+                              <p class="text-success">Reviewed <i class="fas fa-check"></i></p>
+                              <p>Comment: {{element.process[0].comment}}</p>
+                              
+                          </li>
+
+                          <!--=====================================
+                          2 Momento: Cuando se envía el producto
+                          ======================================-->
+
+                           <!-- Cuando el status es ok -->
+
+                          <li *ngIf="element.process[1].stage == 'sent' && element.process[1].status == 'ok'"
+                            class="success ml-5"> 
+
+                                <h5>{{element.process[1].date | date}}</h5>
+                                <p class="text-success">Sent <i class="fas fa-check"></i></p>
+                                <p>Comment: {{element.process[1].comment}}</p>
+                                
+                            </li>
+
+                            <!-- Cuando el status es pendiente -->
+
+                            <li *ngIf="element.process[1].stage == 'sent' && element.process[1].status != 'ok'" 
+                            class="process ml-5">
+                                <h5>{{element.process[1].date | date}}</h5>         
+                                <p>Sent</p>
+                                <button class="btn btn-primary" disabled>
+                                  <span class="spinner-border spinner-border-sm"></span>
+                                  In process
+                                </button>
+                            </li>
+
+                            <!--=====================================
+                          3 Momento: Cuando se entrega el producto
+                          ======================================-->
+
+                           <!-- Cuando el status es ok -->
+
+                          <li *ngIf="element.process[2].stage == 'delivered' && element.process[2].status == 'ok'"
+                            class="success ml-5"> 
+
+                                <h5>{{element.process[2].date | date}}</h5>
+                                <p class="text-success">Delivered <i class="fas fa-check"></i></p>
+                                <p>Comment: {{element.process[2].comment}}</p>
+                                
+                            </li>
+
+                            <!-- Cuando el status es pendiente -->
+
+                            <li *ngIf="element.process[2].stage == 'delivered' && element.process[2].status != 'ok'" 
+                            class="process ml-5">
+                                <h5>{{element.process[2].date | date}}</h5>         
+                                <p>Delivered</p>
+                                <button class="btn btn-primary" disabled>
+                                  <span class="spinner-border spinner-border-sm"></span>
+                                  In process
+                                </button>
+                            </li>
+
+                          
+
+                        </ul>
+
+
+                      </li>
+
+                    </ul>   
+
+                  </div>
+
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+                  class="example-element-row"
+                  [class.example-expanded-row]="expandedElement === element">
+              </tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+
+              <!-- Row shown when there is no matching data. -->
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell text-center" [attr.colspan]="displayedColumns.length">No data matching the filter</td>
+              </tr>
+
+             </table>
+
+              <div *ngIf="loadData" class="text-center m-5">
+              
+                <div class="spinner-border"></div>
+
+              </div>
+             
+           </div>
+
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer">
+          <mat-paginator [hidden]="loadData" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+        </div>
+        <!-- /.card-footer-->
+      </div>
+      <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+
+
